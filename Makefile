@@ -8,16 +8,23 @@ PATH_FLAGS = --prefix=/usr --infodir=/tmp/trash
 CONF_FLAGS =
 CFLAGS = -static -static-libgcc -Wl,-static
 
-PACKAGE_VERSION = $$(git --git-dir=upstream/.git describe --tags | sed 's/v//')
+PACKAGE_VERSION = 2.4.6
 PATCH_VERSION = $$(cat version)
 VERSION = $(PACKAGE_VERSION)-$(PATCH_VERSION)
 
-.PHONY : default submodule deps manual container deps build version push local
+SOURCE_URL = https://ftp.gnu.org/pub/gnu/$(PACKAGE)/$(PACKAGE)-$(PACKAGE_VERSION).tar.xz
+SOURCE_PATH = /tmp/source
+SOURCE_TARBALL = /tmp/source.tar.gz
 
-default: submodule container
+.PHONY : default source deps manual container deps build version push local
 
-submodule:
-	git submodule update --init
+default: container
+
+source:
+	rm -rf $(SOURCE_PATH) $(SOURCE_TARBALL)
+	mkdir $(SOURCE_PATH)
+	curl -sLo $(SOURCE_TARBALL) $(SOURCE_URL)
+	tar -x -C $(SOURCE_PATH) -f $(SOURCE_TARBALL) --strip-components=1
 
 manual: submodule
 	./meta/launch /bin/bash || true
@@ -27,7 +34,7 @@ container:
 
 deps:
 
-build: submodule deps
+build: source deps
 	rm -rf $(BUILD_DIR)
 	cp -R upstream $(BUILD_DIR)
 	cd $(BUILD_DIR) && CC=musl-gcc CFLAGS='$(CFLAGS) $(LIBGPG-ERROR_PATH) $(LIBASSUAN_PATH) $(LIBGCRYPT_PATH) $(LIBKSBA_PATH) $(NPTH_PATH)' ./configure $(PATH_FLAGS) $(CONF_FLAGS)
