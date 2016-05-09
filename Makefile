@@ -34,6 +34,8 @@ build: submodule
 	rm -rf $(BUILD_DIR)/.git
 	cp -R .git/modules/upstream $(BUILD_DIR)/.git
 	sed -i '/worktree/d' $(BUILD_DIR)/.git/config
+	cd $(BUILD_DIR) && GIT_COMMITTER_NAME=root GIT_COMMITTER_EMAIL=root@root.com git cherry-pick 03ec5f495586b8350a7653a440a6e563bd2b8889
+	cd $(BUILD_DIR) && ./bootstrap
 	cd $(BUILD_DIR) && CC=musl-gcc CFLAGS='$(CFLAGS) $(LIBGPG-ERROR_PATH) $(LIBASSUAN_PATH) $(LIBGCRYPT_PATH) $(LIBKSBA_PATH) $(NPTH_PATH)' ./configure $(PATH_FLAGS) $(CONF_FLAGS)
 	cd $(BUILD_DIR) && make DESTDIR=$(RELEASE_DIR) install
 	rm -rf $(RELEASE_DIR)/tmp
