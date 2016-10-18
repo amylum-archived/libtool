@@ -1,0 +1,22 @@
+name 'libtool'
+org 'amylum'
+
+licenses 'COPYING'
+
+configure_flags(
+  prefix: '/usr'
+)
+
+harden
+
+build do
+  run 'git cherry-pick 03ec5f495586b8350a7653a440a6e563bd2b8889', 'GIT_COMMITTER_NAME' => 'root', 'GIT_COMMITTER_EMAIL' => 'root@example.com'
+  run './bootstrap'
+  configure
+  make
+  install
+end
+
+test do
+  # TODO: add tests
+end
